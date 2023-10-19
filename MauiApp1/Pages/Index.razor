@@ -1,0 +1,44 @@
+﻿@page "/"
+@using ZXing.Mobile
+@using ZXing
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?"/>
+
+<div>
+    <video id="camera" autoplay></video>
+</div>
+
+<p>@result</p>
+
+@code {
+    private MobileBarcodeScanner scanner;
+    private string result = "Сканируйте QR-код";
+
+    protected override async Task OnInitializedAsync()
+    {
+        scanner = new MobileBarcodeScanner();
+        scanner.UseCustomOverlay = false;
+
+        var options = new MobileBarcodeScanningOptions
+        {
+            PossibleFormats = new List<BarcodeFormat> { BarcodeFormat.QR_CODE }
+        };
+
+        scanner.OnScanResult += (result) => { HandleScanResult(result); };
+
+        await scanner.StartScanningAsync(options);
+    }
+
+    private void HandleScanResult(ZXing.Result result)
+    {
+        if (result != null)
+        {
+            this.result = "Результат сканирования: " + result.Text;
+        }
+    }
+
+}
